@@ -21,8 +21,13 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_rightBottomMotor = new PWMSparkMax(3);
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
+  private boolean switched = false;
+  private boolean toggle = false;
+
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
+
+
 
   @Override
   public void robotInit() {
@@ -32,20 +37,37 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void teleopInit() {
+  
+  }
+
+  @Override
   public void teleopPeriodic() {
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the X turns left and right.
-    
-    double turn;
 
-    if(m_stick.getRawButton(2)) { //Allows steering toggle
-      turn = m_stick.getZ();
-    } else {
-      turn = m_stick.getX();
+    double turn = 0;
+
+    
+    if (m_stick.getRawButtonPressed(2)) {
+      if(toggle) {
+        switched = false;
+        toggle = false;
+      } else {
+        switched = true;
+        toggle = true;
+      }
     }
 
-    System.out.println(m_stick.getRawButton(2));
+    if (switched == true) {
+      turn = m_stick.getZ();
+      System.out.println("Z axis");
+    } else if(switched == false) {
+      turn = m_stick.getX();
+      System.out.println("X axis");
+    }
+    
 
     double speedPot = m_stick.getThrottle();
     motorSpeed = map(speedPot, 1, -1, 0.55, 1);
