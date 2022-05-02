@@ -22,23 +22,19 @@ public class Robot extends TimedRobot {
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
   private boolean switched = false;
-  private boolean toggle = false;
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
 
-
-
   @Override
   public void robotInit() {
     //inverts right side of robot otherwise would be driving in circles when told to go forward
-
     m_right.setInverted(true);
   }
 
   @Override
   public void teleopInit() {
-  
+  //ran when teleop is enabled
   }
 
   @Override
@@ -51,12 +47,10 @@ public class Robot extends TimedRobot {
 
     
     if (m_stick.getRawButtonPressed(2)) {
-      if(toggle) {
+      if(switched) {
         switched = false;
-        toggle = false;
       } else {
         switched = true;
-        toggle = true;
       }
     }
 
