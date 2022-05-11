@@ -22,5 +22,4 @@ public class I2CCOM {
   public void sendData(int address, int data) {
     this.wire.write(address, data);
   }
-
 }

@@ -9,9 +9,19 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import frc.robot.utils.I2CCOM;
+import edu.wpi.first.wpilibj.Servo;
 
 public class Robot extends TimedRobot {
+  I2CCOM arduino;
+
   double motorSpeed = 0.55; //0.55 lowest speed 1 full speed
+  double leftArmMove = 0;
+  double rightArmMove = 0; 
+  boolean isMoving = false; 
+
+  //max value is 140 and minimum is 40 
+  private Servo actuatorServo;
 
   private final PWMSparkMax m_leftTopMotor = new PWMSparkMax(0);
   private final PWMSparkMax m_leftBottomMotor = new PWMSparkMax(1);
@@ -21,6 +31,9 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_rightBottomMotor = new PWMSparkMax(3);
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
+  private final PWMSparkMax m_leftArmMotor = new PWMSparkMax(7);
+  private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(5);
+  
   private boolean switched = false;
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
@@ -30,6 +43,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     //inverts right side of robot otherwise would be driving in circles when told to go forward
     m_right.setInverted(true);
+    arduino = new I2CCOM(1);
+    Servo actuatorServo = new Servo(6);
   }
 
   @Override
@@ -39,9 +54,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Drive with arcade drive.
-    // That means that the Y axis drives forward
-    // and backward, and the X turns left and right.
+    //actuatorServo.set(0.5);
+    m_leftArmMotor.set(-0.5);
+
+    if(m_stick.getRawButtonPressed(1)) {
+      arduino.sendData(1, 1);
+    } else {
+      arduino.sendData(1, 0);
+    }
 
     double turn = 0;
 
@@ -56,16 +76,23 @@ public class Robot extends TimedRobot {
 
     if (switched == true) {
       turn = m_stick.getZ();
-      System.out.println("Z axis");
+      
     } else if(switched == false) {
       turn = m_stick.getX();
-      System.out.println("X axis");
+      
     }
     
 
     double speedPot = m_stick.getThrottle();
     motorSpeed = map(speedPot, 1, -1, 0.55, 1);
-    
+
+    // motor values range from -1 to 1
+
+    if(m_stick.getRawButtonPressed(7)){
+
+      isMoving = true;
+
+    }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
   }
@@ -73,4 +100,12 @@ public class Robot extends TimedRobot {
   public double map(double x, double in_min, double in_max, double out_min, double out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   }
+
+  public static void delay(int millis){
+    try{
+      Thread.sleep(millis);
+    }catch(Exception E){
+    }
+  }
+
 }
