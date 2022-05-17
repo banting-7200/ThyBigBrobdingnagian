@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.*;
 
 public class Robot extends TimedRobot {
   I2CCOM arduino;
@@ -21,7 +22,11 @@ public class Robot extends TimedRobot {
   boolean isMoving = false; 
 
   //max value is 140 and minimum is 40 
-  private Servo actuatorServo;
+  public Servo amogus = new Servo(9);
+
+  DigitalInput rightArmSwitch = new DigitalInput(0);
+  DigitalInput leftArmSwitch = new DigitalInput(1);
+  //rightArmSwitch.get();
 
   private final PWMSparkMax m_leftTopMotor = new PWMSparkMax(0);
   private final PWMSparkMax m_leftBottomMotor = new PWMSparkMax(1);
@@ -32,7 +37,7 @@ public class Robot extends TimedRobot {
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
   private final PWMSparkMax m_leftArmMotor = new PWMSparkMax(7);
-  private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(5);
+  //private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(5);
   
   private boolean switched = false;
 
@@ -43,29 +48,34 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     //inverts right side of robot otherwise would be driving in circles when told to go forward
     m_right.setInverted(true);
-    arduino = new I2CCOM(1);
-    Servo actuatorServo = new Servo(6);
+    //arduino = new I2CCOM(1);
+    
   }
 
   @Override
   public void teleopInit() {
   //ran when teleop is enabled
+  //m_leftArmMotor.set(0.8);
+  //delay(500);
+  //m_leftArmMotor.set(0);
   }
 
   @Override
   public void teleopPeriodic() {
-    //actuatorServo.set(0.5);
-    m_leftArmMotor.set(-0.5);
+    
+    amogus.set(0.5);
+    //amogus.setAngle(90);
 
+    /*
     if(m_stick.getRawButtonPressed(1)) {
       arduino.sendData(1, 1);
     } else {
       arduino.sendData(1, 0);
     }
+    */
 
     double turn = 0;
 
-    
     if (m_stick.getRawButtonPressed(2)) {
       if(switched) {
         switched = false;
