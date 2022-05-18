@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.*;
 
 public class Robot extends TimedRobot {
@@ -18,11 +17,7 @@ public class Robot extends TimedRobot {
 
   double motorSpeed = 0.55; //0.55 lowest speed 1 full speed
   double leftArmMove = 0;
-  double rightArmMove = 0; 
-  boolean isMoving = false; 
-
-  //max value is 140 and minimum is 40 
-  public Servo amogus = new Servo(9);
+  double rightArmMove = 0;
 
   DigitalInput rightArmSwitch = new DigitalInput(0);
   DigitalInput leftArmSwitch = new DigitalInput(1);
@@ -37,7 +32,7 @@ public class Robot extends TimedRobot {
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
   private final PWMSparkMax m_leftArmMotor = new PWMSparkMax(7);
-  //private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(5);
+  private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(8);
   
   private boolean switched = false;
 
@@ -55,17 +50,22 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
   //ran when teleop is enabled
-  //m_leftArmMotor.set(0.8);
-  //delay(500);
-  //m_leftArmMotor.set(0);
+  /*
+  System.out.println("Going Up");
+  m_leftArmMotor.set(0.8);
+  delay(1000);
+  m_leftArmMotor.set(0);
+  delay(500);
+  System.out.println("Coming Down");
+  m_leftArmMotor.set(-0.8);
+  delay(750);
+  m_leftArmMotor.set(0);
+  delay(500);
+  */
   }
 
   @Override
   public void teleopPeriodic() {
-    
-    amogus.set(0.5);
-    //amogus.setAngle(90);
-
     /*
     if(m_stick.getRawButtonPressed(1)) {
       arduino.sendData(1, 1);
@@ -99,9 +99,21 @@ public class Robot extends TimedRobot {
     // motor values range from -1 to 1
 
     if(m_stick.getRawButtonPressed(7)){
+        System.out.println("Going Up");
+        m_leftArmMotor.set(1);
+        m_rightArmMotor.set(1);
+        delay(650);
+        m_leftArmMotor.set(0);
+        m_rightArmMotor.set(0);
+    }
 
-      isMoving = true;
-
+    if(m_stick.getRawButtonPressed(8)) {
+      System.out.println("Coming Down");
+      m_leftArmMotor.set(-1);
+      m_rightArmMotor.set(-1);
+      delay(525);
+      m_leftArmMotor.set(0);
+      m_rightArmMotor.set(0);
     }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
