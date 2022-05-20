@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -19,9 +17,8 @@ public class Robot extends TimedRobot {
   double leftArmMove = 0;
   double rightArmMove = 0;
 
-  DigitalInput rightArmSwitch = new DigitalInput(0);
-  DigitalInput leftArmSwitch = new DigitalInput(1);
-  //rightArmSwitch.get();
+  DigitalInput leftArmSwitch = new DigitalInput(0);
+  DigitalInput rightArmSwitch = new DigitalInput(1);
 
   private final PWMSparkMax m_leftTopMotor = new PWMSparkMax(0);
   private final PWMSparkMax m_leftBottomMotor = new PWMSparkMax(1);
@@ -31,48 +28,32 @@ public class Robot extends TimedRobot {
   private final PWMSparkMax m_rightBottomMotor = new PWMSparkMax(3);
   private final MotorControllerGroup m_right = new MotorControllerGroup(m_rightTopMotor, m_rightBottomMotor);
 
-  private final PWMSparkMax m_leftArmMotor = new PWMSparkMax(7);
-  private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(8);
-  
-  private boolean switched = false;
+  private final PWMSparkMax m_leftArmMotor = new PWMSparkMax(8);
+  private final PWMSparkMax m_rightArmMotor = new PWMSparkMax(7);
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
+
+  private boolean switched = false;
+
+
 
   @Override
   public void robotInit() {
     //inverts right side of robot otherwise would be driving in circles when told to go forward
     m_right.setInverted(true);
-    //arduino = new I2CCOM(1);
-    
-  }
+    }
 
   @Override
   public void teleopInit() {
   //ran when teleop is enabled
-  /*
-  System.out.println("Going Up");
-  m_leftArmMotor.set(0.8);
-  delay(1000);
-  m_leftArmMotor.set(0);
-  delay(500);
-  System.out.println("Coming Down");
-  m_leftArmMotor.set(-0.8);
-  delay(750);
-  m_leftArmMotor.set(0);
-  delay(500);
-  */
+
   }
 
   @Override
   public void teleopPeriodic() {
-    /*
-    if(m_stick.getRawButtonPressed(1)) {
-      arduino.sendData(1, 1);
-    } else {
-      arduino.sendData(1, 0);
-    }
-    */
+    System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
+    
 
     double turn = 0;
 
@@ -96,27 +77,62 @@ public class Robot extends TimedRobot {
     double speedPot = m_stick.getThrottle();
     motorSpeed = map(speedPot, 1, -1, 0.55, 1);
 
-    // motor values range from -1 to 1
+      Thread leftTest = new Thread() {
+        public void run() {
+            leftArm();
+        }
+    };
+      Thread rightTest = new Thread() {
+        public void run() {
+            rightArm();
+        }
+    };
 
-    if(m_stick.getRawButtonPressed(7)){
-        System.out.println("Going Up");
-        m_leftArmMotor.set(1);
-        m_rightArmMotor.set(1);
-        delay(650);
-        m_leftArmMotor.set(0);
-        m_rightArmMotor.set(0);
+    Thread dance = new Thread() {
+        public void run() {
+          rightArm();
+          delay(500);
+          rightArm();
+          delay(500);
+          rightArm();
+        }
+    };
+
+    if(m_stick.getRawButtonPressed(7)) {
+      leftTest.start();
     }
 
-    if(m_stick.getRawButtonPressed(8)) {
-      System.out.println("Coming Down");
-      m_leftArmMotor.set(-1);
-      m_rightArmMotor.set(-1);
-      delay(525);
-      m_leftArmMotor.set(0);
-      m_rightArmMotor.set(0);
+    if(m_stick.getRawButtonPressed(8)){
+      rightTest.start();
+    }
+
+    if(m_stick.getRawButtonPressed(12)) {
+      dance.start();
     }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
+  }
+
+  public void rightArm() {
+    while(rightArmSwitch.get() == false) {
+      m_rightArmMotor.set(1);
+    }
+    m_rightArmMotor.set(0);
+    delay(500);
+    m_rightArmMotor.set(-1);
+    delay(550);
+    m_rightArmMotor.set(0);
+  }
+
+  public void leftArm() {
+    while(leftArmSwitch.get() == false) {
+      m_leftArmMotor.set(1);
+    }
+    m_leftArmMotor.set(0);
+    delay(250);
+    m_leftArmMotor.set(-1);
+    delay(550);
+    m_leftArmMotor.set(0);
   }
 
   public double map(double x, double in_min, double in_max, double out_min, double out_max) {
