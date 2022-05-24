@@ -9,8 +9,6 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class Robot extends TimedRobot {
   I2CCOM arduino;
@@ -41,7 +39,9 @@ public class Robot extends TimedRobot {
   private boolean switched = false;
 
   AddressableLED m_led = new AddressableLED(9);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(55);
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
+
+  DoubleSolenoid head = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
 
   @Override
   public void robotInit() {
@@ -124,6 +124,10 @@ public class Robot extends TimedRobot {
 
     if(m_stick.getRawButtonPressed(12)) {
       dance.start();
+    }
+    if(m_stick.getRawButtonPressed(1)) {
+      head.toggle();
+      System.out.println("Pneumatics Toggled");
     }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
