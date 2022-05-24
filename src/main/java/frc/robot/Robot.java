@@ -9,9 +9,13 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class Robot extends TimedRobot {
   I2CCOM arduino;
+
+  public int m_rainbowFirstPixelHue = 0;
 
   double motorSpeed = 0.55; //0.55 lowest speed 1 full speed
   double leftArmMove = 0;
@@ -36,13 +40,25 @@ public class Robot extends TimedRobot {
 
   private boolean switched = false;
 
-
+  AddressableLED m_led = new AddressableLED(9);
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(55);
 
   @Override
   public void robotInit() {
-    //inverts right side of robot otherwise would be driving in circles when told to go forward
     m_right.setInverted(true);
+
+    m_led.setLength(m_ledBuffer.getLength());
+
+    // Set the data
+    m_led.start();
+
     }
+
+  @Override
+  public void robotPeriodic() {
+    rainbow();
+    m_led.setData(m_ledBuffer);
+  }
 
   @Override
   public void teleopInit() {
@@ -52,7 +68,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
+    //System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
     
 
     double turn = 0;
@@ -144,6 +160,22 @@ public class Robot extends TimedRobot {
       Thread.sleep(millis);
     }catch(Exception E){
     }
+  }
+
+  private void rainbow() {
+    
+    // For every pixel
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Calculate the hue - hue is easier for rainbows because the color
+      // shape is a circle so only one value needs to precess
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
+      // Set the value
+      m_ledBuffer.setHSV(i, hue, 255, 128);
+    }
+    // Increase by to make the rainbow "move"
+    m_rainbowFirstPixelHue += 3;
+    // Check bounds
+    m_rainbowFirstPixelHue %= 180;
   }
 
 }
