@@ -52,12 +52,9 @@ public class Robot extends TimedRobot {
     m_right.setInverted(true);
 
     m_led.setLength(m_ledBuffer.getLength());
-
-    // Set the data
     m_led.start();
 
     head.set(kReverse);
-
     }
 
   @Override
@@ -69,14 +66,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
   //ran when teleop is enabled
-
   }
 
   @Override
   public void teleopPeriodic() {
     //System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
     
-
     double turn = 0;
 
     if (m_stick.getRawButtonPressed(2)) {
@@ -88,77 +83,93 @@ public class Robot extends TimedRobot {
     }
 
     if (switched == true) {
-      turn = m_stick.getZ();
-      
+      turn = m_stick.getZ();  
     } else if(switched == false) {
       turn = m_stick.getX();
-      
     }
     
-
     double speedPot = m_stick.getThrottle();
     motorSpeed = map(speedPot, 1, -1, 0.55, 1);
 
-      Thread leftTest = new Thread() {
-        public void run() {
-            leftArm();
+    Thread leftArm = new Thread() {
+      public void run() {
+        while(leftArmSwitch.get() == false) {
+          m_leftArmMotor.set(1);
         }
-    };
-      Thread rightTest = new Thread() {
-        public void run() {
-            rightArm();
-        }
+        m_leftArmMotor.set(0);
+        delay(200);
+        m_leftArmMotor.set(-1);
+        delay(550);
+        m_leftArmMotor.set(0);
+      }
     };
 
-    Thread dance = new Thread() {
-        public void run() {
-          rightArm();
-          delay(500);
-          rightArm();
-          delay(500);
-          rightArm();
+    Thread rightArm = new Thread() {
+      public void run() {
+        while(rightArmSwitch.get() == false) {
+          m_rightArmMotor.set(1);
         }
+        m_rightArmMotor.set(0);
+        delay(200);
+        m_rightArmMotor.set(-1);
+        delay(550);
+        m_rightArmMotor.set(0);
+      }
+    };
+
+    Thread leftHalf = new Thread() {
+      public void run() {
+        if(leftArmSwitch.get() == false) {
+          m_leftArmMotor.set(1);
+          delay(350);
+          m_leftArmMotor.set(0);
+          delay(250);
+          m_leftArmMotor.set(-1);
+          delay(300);
+          m_leftArmMotor.set(0);
+        }
+      }
+    };
+
+    Thread rightHalf = new Thread() {
+      public void run() {
+        if(rightArmSwitch.get() == false) {
+          m_rightArmMotor.set(1);
+          delay(350);
+          m_rightArmMotor.set(0);
+          delay(250);
+          m_rightArmMotor.set(-1);
+          delay(300);
+          m_rightArmMotor.set(0);
+        }
+      }
     };
 
     if(m_stick.getRawButtonPressed(7)) {
-      leftTest.start();
+      leftArm.start();
     }
 
     if(m_stick.getRawButtonPressed(8)){
-      rightTest.start();
+      rightArm.start();
+    }
+
+    if(m_stick.getRawButtonPressed(9)) {
+      leftHalf.start();
+    }
+
+    if(m_stick.getRawButtonPressed(10)) {
+      rightHalf.start();
+    }
+
+    if(m_stick.getRawButtonPressed(11)) {
+      head.toggle();
     }
 
     if(m_stick.getRawButtonPressed(12)) {
-      dance.start();
-    }
-    if(m_stick.getRawButtonPressed(1)) {
-      head.toggle();
-      System.out.println("Pneumatics Toggled");
+      //reserved
     }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
-  }
-
-  public void rightArm() {
-    while(rightArmSwitch.get() == false) {
-      m_rightArmMotor.set(1);
-    }
-    m_rightArmMotor.set(0);
-    delay(500);
-    m_rightArmMotor.set(-1);
-    delay(550);
-    m_rightArmMotor.set(0);
-  }
-
-  public void leftArm() {
-    while(leftArmSwitch.get() == false) {
-      m_leftArmMotor.set(1);
-    }
-    m_leftArmMotor.set(0);
-    delay(250);
-    m_leftArmMotor.set(-1);
-    delay(550);
-    m_leftArmMotor.set(0);
   }
 
   public double map(double x, double in_min, double in_max, double out_min, double out_max) {
@@ -173,19 +184,11 @@ public class Robot extends TimedRobot {
   }
 
   private void rainbow() {
-    
-    // For every pixel
     for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
       final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      // Set the value
       m_ledBuffer.setHSV(i, hue, 255, 128);
     }
-    // Increase by to make the rainbow "move"
     m_rainbowFirstPixelHue += 3;
-    // Check bounds
     m_rainbowFirstPixelHue %= 180;
   }
-
 }
