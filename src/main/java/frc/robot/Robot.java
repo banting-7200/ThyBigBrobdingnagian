@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.*;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+
 
 public class Robot extends TimedRobot {
   I2CCOM arduino;
@@ -41,7 +43,9 @@ public class Robot extends TimedRobot {
   AddressableLED m_led = new AddressableLED(9);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
 
-  DoubleSolenoid head = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
+
+  DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 0, 1);
+
 
   @Override
   public void robotInit() {
@@ -51,6 +55,8 @@ public class Robot extends TimedRobot {
 
     // Set the data
     m_led.start();
+
+    head.set(kReverse);
 
     }
 
