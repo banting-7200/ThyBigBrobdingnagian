@@ -17,7 +17,7 @@ public class Robot extends TimedRobot {
 
   public int m_rainbowFirstPixelHue = 0;
 
-  double motorSpeed = 0.55; //0.55 lowest speed 1 full speed
+  double motorSpeed = 0.6; //0.55 lowest speed 1 full speed
   double leftArmMove = 0;
   double rightArmMove = 0;
 
@@ -88,8 +88,8 @@ public class Robot extends TimedRobot {
       turn = m_stick.getX();
     }
     
-    double speedPot = m_stick.getThrottle();
-    motorSpeed = map(speedPot, 1, -1, 0.55, 1);
+    //double speedPot = m_stick.getThrottle();
+    //motorSpeed = map(speedPot, 1, -1, 0.55, 1);
 
     Thread leftArm = new Thread() {
       public void run() {
@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
         m_leftArmMotor.set(-1);
         delay(550);
         m_leftArmMotor.set(0);
+        System.out.println("ThreadCalled");
       }
     };
 
@@ -125,8 +126,8 @@ public class Robot extends TimedRobot {
           m_leftArmMotor.set(0);
           delay(250);
           m_leftArmMotor.set(-1);
-          delay(300);
-          m_leftArmMotor.set(0);
+          delay(325);
+          m_leftArmMotor.set(0); 
         }
       }
     };
@@ -139,13 +140,14 @@ public class Robot extends TimedRobot {
           m_rightArmMotor.set(0);
           delay(250);
           m_rightArmMotor.set(-1);
-          delay(300);
+          delay(325);
           m_rightArmMotor.set(0);
         }
       }
     };
 
     if(m_stick.getRawButtonPressed(7)) {
+      System.out.println("left arm toggled");
       leftArm.start();
     }
 
@@ -166,7 +168,29 @@ public class Robot extends TimedRobot {
     }
 
     if(m_stick.getRawButtonPressed(12)) {
-      //reserved
+      Thread dance = new Thread() {
+        public void run() {
+          head.toggle();
+          delay(500);
+          head.toggle();
+          leftArmTest();
+          rightArmTest();
+          head.toggle();
+          delay(500);
+          head.toggle();
+          delay(1000);
+          head.toggle();
+          delay(500);
+          head.toggle();
+          leftArmTest();
+          delay(1000);
+          head.toggle();
+          delay(500);
+          head.toggle();
+          rightArmTest();
+        }
+      };
+      dance.start();
     }
 
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
@@ -176,7 +200,7 @@ public class Robot extends TimedRobot {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   }
 
-  public static void delay(int millis){
+  public void delay(int millis){
     try{
       Thread.sleep(millis);
     }catch(Exception E){
@@ -190,5 +214,37 @@ public class Robot extends TimedRobot {
     }
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
+  }
+
+  private void leftArmTest() {
+    Thread leftArmTest = new Thread() {
+      public void run() {
+        while(leftArmSwitch.get() == false) {
+          m_leftArmMotor.set(1);
+        }
+        m_leftArmMotor.set(0);
+        delay(200);
+        m_leftArmMotor.set(-1);
+        delay(550);
+        m_leftArmMotor.set(0);
+      }
+    };
+    leftArmTest.start();
+  }
+
+  private void rightArmTest() {
+    Thread rightArmTest = new Thread() {
+      public void run() {
+        while(rightArmSwitch.get() == false) {
+          m_rightArmMotor.set(1);
+        }
+        m_rightArmMotor.set(0);
+        delay(200);
+        m_rightArmMotor.set(-1);
+        delay(550);
+        m_rightArmMotor.set(0);
+      }
+    };
+    rightArmTest.start();
   }
 }
