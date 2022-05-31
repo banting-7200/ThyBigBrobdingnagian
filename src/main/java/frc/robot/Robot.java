@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.*;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.cameraserver.CameraServer;
 
 
 public class Robot extends TimedRobot {
@@ -55,6 +58,9 @@ public class Robot extends TimedRobot {
     m_led.start();
 
     head.set(kReverse);
+
+    UsbCamera camera = CameraServer.startAutomaticCapture();
+    camera.setResolution(640, 480);
     }
 
   @Override
@@ -94,6 +100,11 @@ public class Robot extends TimedRobot {
     Thread leftArm = new Thread() {
       public void run() {
         while(leftArmSwitch.get() == false) {
+          // Emergency Stop the Arm
+          if(m_stick.getRawButtonPressed(4)) {
+            m_leftArmMotor.set(0);
+            return;
+          }
           m_leftArmMotor.set(1);
         }
         m_leftArmMotor.set(0);
@@ -108,6 +119,11 @@ public class Robot extends TimedRobot {
     Thread rightArm = new Thread() {
       public void run() {
         while(rightArmSwitch.get() == false) {
+          // Emergency Stop the Arm
+          if(m_stick.getRawButtonPressed(4)) { 
+            m_rightArmMotor.set(0);
+            return;
+          }          
           m_rightArmMotor.set(1);
         }
         m_rightArmMotor.set(0);
@@ -163,7 +179,7 @@ public class Robot extends TimedRobot {
       rightHalf.start();
     }
 
-    if(m_stick.getRawButtonPressed(11)) {
+    if(m_stick.getRawButtonPressed(1)) {
       head.toggle();
     }
 
