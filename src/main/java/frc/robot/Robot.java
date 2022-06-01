@@ -13,6 +13,9 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import org.opencv.core.Mat;
 
 
 public class Robot extends TimedRobot {
@@ -42,6 +45,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 
   private boolean switched = false;
+  private boolean rainBowLights = false;
 
   AddressableLED m_led = new AddressableLED(9);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
@@ -49,7 +53,7 @@ public class Robot extends TimedRobot {
 
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 0, 1);
 
-
+  
   @Override
   public void robotInit() {
     m_right.setInverted(true);
@@ -59,9 +63,29 @@ public class Robot extends TimedRobot {
 
     head.set(kReverse);
 
-    UsbCamera camera = CameraServer.startAutomaticCapture();
-    camera.setResolution(640, 480);
-    }
+    Thread cameraThread = new Thread( () -> {
+      // Get the Camera from CameraServer and set resolution
+      UsbCamera camera = CameraServer.startAutomaticCapture();
+      camera.setResolution(640, 480);
+
+      CvSink cvSink = CameraServer.getVideo();
+      CvSource outputStream = CameraServer.putVideo("Front Camera", 640, 480); // Name Camera On Dashboard And Set Dashboard Resolutiom
+
+      Mat mat = new Mat();
+
+      while (!Thread.interrupted()) {
+        if(cvSink.grabFrame(mat) == 0) {
+          outputStream.notifyError(cvSink.getError());
+          continue;
+        }
+        outputStream.putFrame(mat);
+      }
+    });
+    cameraThread.setDaemon(true);
+    cameraThread.start();
+
+    
+  }
 
   @Override
   public void robotPeriodic() {
@@ -162,6 +186,14 @@ public class Robot extends TimedRobot {
       }
     };
 
+    if(m_stick.getRawButtonPressed(3)) {
+      if(!rainBowLights) {
+        rainBowLights = true;
+      } else {
+        rainBowLights = false;
+      }
+    }
+
     if(m_stick.getRawButtonPressed(7)) {
       System.out.println("left arm toggled");
       leftArm.start();
@@ -231,6 +263,13 @@ public class Robot extends TimedRobot {
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
   }
+
+/* --------------------------------------------------
+
+TEST CODE
+
+mostly added this cuz I kept getting lost
+-------------------------------------------------- */
 
   private void leftArmTest() {
     Thread leftArmTest = new Thread() {
