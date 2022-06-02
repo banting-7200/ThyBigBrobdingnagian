@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
 import edu.wpi.first.wpilibj.*;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.cameraserver.CameraServer;
+
 
 
 public class Robot extends TimedRobot {
@@ -17,7 +20,7 @@ public class Robot extends TimedRobot {
 
   public int m_rainbowFirstPixelHue = 0;
 
-  double motorSpeed = 0.6; //0.55 lowest speed 1 full speed
+  double motorSpeed = 0.6;//0.55 lowest speed 1 full speed
   double leftArmMove = 0;
   double rightArmMove = 0;
 
@@ -39,12 +42,27 @@ public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 
   private boolean switched = false;
+  private boolean rightArmToggleBool = false;
+  private boolean leftArmToggleBool = false;
 
   AddressableLED m_led = new AddressableLED(9);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
 
 
-  DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 0, 1);
+  DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
+
+
+  // Button Map
+  int headToggle = 1;
+  int invertDrive = 2;
+  int leftArmToggleButton = 5;
+  int rightArmToggleButton = 6;
+  int leftArmFullButton = 7;
+  int rightArmFullButton = 8;
+  int leftArmHalfButton = 9;
+  int rightArmHalfButton = 10;
+  int danceButton = 12;
+  int emergencyStopArms;
 
 
   @Override
@@ -55,7 +73,10 @@ public class Robot extends TimedRobot {
     m_led.start();
 
     head.set(kReverse);
-    }
+
+    CameraServer.startAutomaticCapture();
+    
+  }
 
   @Override
   public void robotPeriodic() {
@@ -99,21 +120,20 @@ public class Robot extends TimedRobot {
         m_leftArmMotor.set(0);
         delay(200);
         m_leftArmMotor.set(-1);
-        delay(550);
+        delay(750); //550
         m_leftArmMotor.set(0);
-        System.out.println("ThreadCalled");
       }
     };
 
     Thread rightArm = new Thread() {
       public void run() {
-        while(rightArmSwitch.get() == false) {
+        while(rightArmSwitch.get() == false) {      
           m_rightArmMotor.set(1);
         }
         m_rightArmMotor.set(0);
         delay(200);
         m_rightArmMotor.set(-1);
-        delay(550);
+        delay(750); // 550
         m_rightArmMotor.set(0);
       }
     };
@@ -122,7 +142,13 @@ public class Robot extends TimedRobot {
       public void run() {
         if(leftArmSwitch.get() == false) {
           m_leftArmMotor.set(1);
-          delay(350);
+          delay(550); //350
+          // fail safe
+          if(leftArmSwitch.get() == true) {
+            m_leftArmMotor.set(-1);
+            delay(750); //550
+            m_leftArmMotor.set(0);
+          }
           m_leftArmMotor.set(0);
           delay(250);
           m_leftArmMotor.set(-1);
@@ -136,34 +162,110 @@ public class Robot extends TimedRobot {
       public void run() {
         if(rightArmSwitch.get() == false) {
           m_rightArmMotor.set(1);
-          delay(350);
+          delay(550); //350
+          // fail safe
+          if(rightArmSwitch.get() == true) {
+            m_rightArmMotor.set(-1);
+            delay(750); //550
+            m_rightArmMotor.set(0);
+          }
           m_rightArmMotor.set(0);
           delay(250);
           m_rightArmMotor.set(-1);
           delay(325);
           m_rightArmMotor.set(0);
+
         }
       }
     };
 
-    if(m_stick.getRawButtonPressed(7)) {
-      System.out.println("left arm toggled");
+    Thread leftHalfToggle = new Thread() {
+      public void run() {
+        if(leftArmSwitch.get() == false) {
+          leftArmToggleBool = true;
+
+          m_leftArmMotor.set(1);
+          delay(550); //350
+
+          // fail safe
+          if(leftArmSwitch.get() == true) {
+            m_leftArmMotor.set(-1);
+            delay(750); //550
+            m_leftArmMotor.set(0);
+            return; // end thread
+          }
+          m_leftArmMotor.set(0);
+
+          while(!m_stick.getRawButtonPressed(leftArmToggleButton)) {}
+
+          delay(250);
+          m_leftArmMotor.set(-1);
+          delay(325);
+          m_leftArmMotor.set(0);
+
+          leftArmToggleBool = false;
+        }
+      }
+    };
+
+    Thread rightHalfToggle = new Thread() {
+      public void run() {
+        if(rightArmSwitch.get() == false) {
+          rightArmToggleBool = true;
+
+          m_rightArmMotor.set(1);
+          delay(550); //350
+
+          // fail safe
+          if(rightArmSwitch.get() == true) {
+            m_rightArmMotor.set(-1);
+            delay(750); //550
+            m_rightArmMotor.set(0);
+            return; // End Thread
+          }
+          m_rightArmMotor.set(0);
+
+          while(!m_stick.getRawButtonPressed(rightArmToggleButton)) {}
+
+          delay(250);
+          m_rightArmMotor.set(-1);
+          delay(325);
+          m_rightArmMotor.set(0);
+
+          rightArmToggleBool = false;
+        }
+      }
+    };
+
+    if(m_stick.getRawButtonPressed(leftArmToggleButton)) {
+      if(leftArmToggleBool == false){
+        leftHalfToggle.start();
+      }
+    }
+
+    if(m_stick.getRawButtonPressed(rightArmToggleButton)) {
+      if(rightArmToggleBool == false) {
+        rightHalfToggle.start();
+      }
+    }
+
+    if(m_stick.getRawButtonPressed(leftArmFullButton)) {
       leftArm.start();
     }
 
-    if(m_stick.getRawButtonPressed(8)){
+    if(m_stick.getRawButtonPressed(rightArmFullButton)){
       rightArm.start();
     }
 
-    if(m_stick.getRawButtonPressed(9)) {
+    if(m_stick.getRawButtonPressed(leftArmHalfButton)) {
       leftHalf.start();
     }
 
-    if(m_stick.getRawButtonPressed(10)) {
+    if(m_stick.getRawButtonPressed(rightArmHalfButton)) {
       rightHalf.start();
     }
 
-    if(m_stick.getRawButtonPressed(11)) {
+    if(m_stick.getRawButtonPressed(headToggle)) {
       head.toggle();
     }
 
@@ -215,6 +317,12 @@ public class Robot extends TimedRobot {
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
   }
+
+/*
+
+Test Code:
+
+*/
 
   private void leftArmTest() {
     Thread leftArmTest = new Thread() {
