@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
   // Button Map
   int headToggle = 1;
   int invertDrive = 2;
+  int emergencyStopArms = 3;
   int leftArmToggleButton = 5;
   int rightArmToggleButton = 6;
   int leftArmFullButton = 7;
@@ -62,8 +63,8 @@ public class Robot extends TimedRobot {
   int leftArmHalfButton = 9;
   int rightArmHalfButton = 10;
   int danceButton = 12;
-  int emergencyStopArms;
-
+  
+ 
 
   @Override
   public void robotInit() {
@@ -114,7 +115,7 @@ public class Robot extends TimedRobot {
 
     Thread leftArm = new Thread() {
       public void run() {
-        while(leftArmSwitch.get() == false) {
+        while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(emergencyStopArms) == false) {
           m_leftArmMotor.set(1);
         }
         m_leftArmMotor.set(0);
@@ -127,7 +128,7 @@ public class Robot extends TimedRobot {
 
     Thread rightArm = new Thread() {
       public void run() {
-        while(rightArmSwitch.get() == false) {      
+        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(emergencyStopArms) == false) {      
           m_rightArmMotor.set(1);
         }
         m_rightArmMotor.set(0);
