@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 
   private boolean switched = false;
+  private boolean rainbowSwitched = false;
   private boolean rightArmToggleBool = false;
   private boolean leftArmToggleBool = false;
 
@@ -50,7 +51,8 @@ public class Robot extends TimedRobot {
 
   // Button Map
   int headToggle = 1;
-  int invertDrive = 2;
+  //int invertDrive = 2;
+  int rainbowLightToggle = 2;
   int leftArmToggleButton = 5;
   int rightArmToggleButton = 6;
   int leftArmFullButton = 7;
@@ -75,7 +77,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    if(m_stick.getRawButtonPressed(rainbowLightToggle)){
+      if(rainbowSwitched){
+      rainbowSwitched = false;
+    }else {
+      rainbowSwitched = true;
+    }
+  }
+
+  if (rainbowSwitched == true) {
     rainbow();
+  } else if(rainbowSwitched == false) {
+    rainbowOff();
+  }
+     
     m_led.setData(m_ledBuffer);
   }
 
@@ -88,8 +104,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
     
-    double turn = 0;
+    double turn = m_stick.getX();
 
+    /*
     if (m_stick.getRawButtonPressed(2)) {
       if(switched) {
         switched = false;
@@ -103,7 +120,8 @@ public class Robot extends TimedRobot {
     } else if(switched == false) {
       turn = m_stick.getX();
     }
-    
+    */
+
     //double speedPot = m_stick.getThrottle();
     //motorSpeed = map(speedPot, 1, -1, 0.55, 1);
 
@@ -289,10 +307,9 @@ public class Robot extends TimedRobot {
     m_rainbowFirstPixelHue %= 180;
   }
 
-/*
-
-Test Code:
-
-*/
-
+  private void rainbowOff() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setHSV(i, 0, 0, 0);
+    }
+  }
 }
