@@ -13,8 +13,6 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
 
-
-
 public class Robot extends TimedRobot {
   I2CCOM arduino;
 
@@ -48,24 +46,20 @@ public class Robot extends TimedRobot {
   AddressableLED m_led = new AddressableLED(9);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
 
-
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
-
 
   // Button Map
   int headToggle = 1;
   int invertDrive = 2;
-  int emergencyStopArms = 3;
   int leftArmToggleButton = 5;
   int rightArmToggleButton = 6;
   int leftArmFullButton = 7;
   int rightArmFullButton = 8;
   int leftArmHalfButton = 9;
   int rightArmHalfButton = 10;
-  int danceButton = 12;
+  int leftForceLimitButton = 11;
+  int rightForceLimitButton = 12;
   
- 
-
   @Override
   public void robotInit() {
     m_right.setInverted(true);
@@ -115,8 +109,10 @@ public class Robot extends TimedRobot {
 
     Thread leftArm = new Thread() {
       public void run() {
-        while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(emergencyStopArms) == false) {
-          m_leftArmMotor.set(1);
+        while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
+          
+            m_leftArmMotor.set(1);
+          
         }
         m_leftArmMotor.set(0);
         delay(200);
@@ -128,7 +124,7 @@ public class Robot extends TimedRobot {
 
     Thread rightArm = new Thread() {
       public void run() {
-        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(emergencyStopArms) == false) {      
+        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(rightForceLimitButton) == false) {      
           m_rightArmMotor.set(1);
         }
         m_rightArmMotor.set(0);
@@ -270,32 +266,6 @@ public class Robot extends TimedRobot {
       head.toggle();
     }
 
-    if(m_stick.getRawButtonPressed(12)) {
-      Thread dance = new Thread() {
-        public void run() {
-          head.toggle();
-          delay(500);
-          head.toggle();
-          leftArmTest();
-          rightArmTest();
-          head.toggle();
-          delay(500);
-          head.toggle();
-          delay(1000);
-          head.toggle();
-          delay(500);
-          head.toggle();
-          leftArmTest();
-          delay(1000);
-          head.toggle();
-          delay(500);
-          head.toggle();
-          rightArmTest();
-        }
-      };
-      dance.start();
-    }
-
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
   }
 
@@ -325,35 +295,4 @@ Test Code:
 
 */
 
-  private void leftArmTest() {
-    Thread leftArmTest = new Thread() {
-      public void run() {
-        while(leftArmSwitch.get() == false) {
-          m_leftArmMotor.set(1);
-        }
-        m_leftArmMotor.set(0);
-        delay(200);
-        m_leftArmMotor.set(-1);
-        delay(550);
-        m_leftArmMotor.set(0);
-      }
-    };
-    leftArmTest.start();
-  }
-
-  private void rightArmTest() {
-    Thread rightArmTest = new Thread() {
-      public void run() {
-        while(rightArmSwitch.get() == false) {
-          m_rightArmMotor.set(1);
-        }
-        m_rightArmMotor.set(0);
-        delay(200);
-        m_rightArmMotor.set(-1);
-        delay(550);
-        m_rightArmMotor.set(0);
-      }
-    };
-    rightArmTest.start();
-  }
 }
