@@ -135,7 +135,7 @@ public class Robot extends TimedRobot {
         m_leftArmMotor.set(0);
         delay(200);
         m_leftArmMotor.set(-1);
-        delay(750); //550
+        delay(475); //550
         m_leftArmMotor.set(0);
       }
     };
@@ -148,7 +148,7 @@ public class Robot extends TimedRobot {
         m_rightArmMotor.set(0);
         delay(200);
         m_rightArmMotor.set(-1);
-        delay(750); // 550
+        delay(475); // 550
         m_rightArmMotor.set(0);
       }
     };
@@ -157,17 +157,17 @@ public class Robot extends TimedRobot {
       public void run() {
         if(leftArmSwitch.get() == false) {
           m_leftArmMotor.set(1);
-          delay(550); //350
+          delay(280); //350
           // fail safe
           if(leftArmSwitch.get() == true) {
             m_leftArmMotor.set(-1);
-            delay(750); //550
+            delay(475); //550
             m_leftArmMotor.set(0);
           }
           m_leftArmMotor.set(0);
           delay(250);
           m_leftArmMotor.set(-1);
-          delay(325);
+          delay(250);
           m_leftArmMotor.set(0); 
         }
       }
@@ -177,17 +177,17 @@ public class Robot extends TimedRobot {
       public void run() {
         if(rightArmSwitch.get() == false) {
           m_rightArmMotor.set(1);
-          delay(550); //350
+          delay(280); //350
           // fail safe
           if(rightArmSwitch.get() == true) {
             m_rightArmMotor.set(-1);
-            delay(750); //550
+            delay(475); //550
             m_rightArmMotor.set(0);
           }
           m_rightArmMotor.set(0);
           delay(250);
           m_rightArmMotor.set(-1);
-          delay(325);
+          delay(250);
           m_rightArmMotor.set(0);
 
         }
@@ -199,14 +199,15 @@ public class Robot extends TimedRobot {
         if(leftArmSwitch.get() == false) {
           leftArmToggleBool = true;
 
-          m_leftArmMotor.set(1);
-          delay(550); //350
+          m_leftArmMotor.set(0.7);
+          delay(350); //350
 
           // fail safe
           if(leftArmSwitch.get() == true) {
             m_leftArmMotor.set(-1);
-            delay(750); //550
+            delay(475); //550
             m_leftArmMotor.set(0);
+            leftArmToggleBool = false;
             return; // end thread
           }
           m_leftArmMotor.set(0);
@@ -214,8 +215,8 @@ public class Robot extends TimedRobot {
           while(!m_stick.getRawButtonPressed(leftArmToggleButton)) {}
 
           delay(250);
-          m_leftArmMotor.set(-1);
-          delay(325);
+          m_leftArmMotor.set(-0.7);
+          delay(280);
           m_leftArmMotor.set(0);
 
           leftArmToggleBool = false;
@@ -228,14 +229,15 @@ public class Robot extends TimedRobot {
         if(rightArmSwitch.get() == false) {
           rightArmToggleBool = true;
 
-          m_rightArmMotor.set(1);
-          delay(550); //350
+          m_rightArmMotor.set(0.7);
+          delay(350); //350
 
           // fail safe
           if(rightArmSwitch.get() == true) {
             m_rightArmMotor.set(-1);
-            delay(750); //550
+            delay(475); //550
             m_rightArmMotor.set(0);
+            rightArmToggleBool = false;
             return; // End Thread
           }
           m_rightArmMotor.set(0);
@@ -243,8 +245,8 @@ public class Robot extends TimedRobot {
           while(!m_stick.getRawButtonPressed(rightArmToggleButton)) {}
 
           delay(250);
-          m_rightArmMotor.set(-1);
-          delay(325);
+          m_rightArmMotor.set(-0.7);
+          delay(280);
           m_rightArmMotor.set(0);
 
           rightArmToggleBool = false;
