@@ -39,10 +39,10 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
 
-  private boolean switched = false;
+  //private boolean switched = false;
   private boolean rainbowSwitched = false;
-  private boolean rightArmToggleBool = false;
-  private boolean leftArmToggleBool = false;
+  public boolean rightArmToggleBool = false;
+  public boolean leftArmToggleBool = false;
 
   AddressableLED m_led = new AddressableLED(9);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
@@ -122,34 +122,34 @@ public class Robot extends TimedRobot {
     }
     */
 
-    //double speedPot = m_stick.getThrottle();
-    //motorSpeed = map(speedPot, 1, -1, 0.55, 1);
+    double armSpeedTemp = m_stick.getThrottle();
+    double armSpeed = map(armSpeedTemp, 1, -1, 0.4, 1);
 
     Thread leftArm = new Thread() {
       public void run() {
         while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
-          
-            m_leftArmMotor.set(1);
-          
+            m_leftArmMotor.set(armSpeed); //was 1
         }
         m_leftArmMotor.set(0);
         delay(200);
         m_leftArmMotor.set(-1);
         delay(475); //550
         m_leftArmMotor.set(0);
+        leftArmToggleBool = false;
       }
     };
 
     Thread rightArm = new Thread() {
       public void run() {
-        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(rightForceLimitButton) == false) {      
-          m_rightArmMotor.set(1);
+        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(rightForceLimitButton) == false) {
+          m_rightArmMotor.set(armSpeed);
         }
         m_rightArmMotor.set(0);
         delay(200);
         m_rightArmMotor.set(-1);
         delay(475); // 550
         m_rightArmMotor.set(0);
+        rightArmToggleBool = false;
       }
     };
 
@@ -271,6 +271,7 @@ public class Robot extends TimedRobot {
     }
 
     if(m_stick.getRawButtonPressed(rightArmFullButton)){
+      System.out.println("Arm Button Pressed");
       rightArm.start();
     }
 
