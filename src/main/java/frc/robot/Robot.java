@@ -72,8 +72,8 @@ public class Robot extends TimedRobot {
     head.set(kReverse);
 
     CameraServer.startAutomaticCapture();
-    
-  }
+    //this is a test
+    }
 
   @Override
   public void robotPeriodic() {
