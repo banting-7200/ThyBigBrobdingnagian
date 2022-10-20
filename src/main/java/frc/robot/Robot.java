@@ -77,7 +77,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-
     if(m_stick.getRawButtonPressed(rainbowLightToggle)){
       if(rainbowSwitched){
       rainbowSwitched = false;
