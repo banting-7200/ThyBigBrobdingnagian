@@ -5,4 +5,8 @@ public class Utility {
         double ratio = (out_max - out_min) / (in_max - in_min);
         return (x - in_min) * ratio + out_min;
     }
+
+    public static void delay(int millis){
+        try{ Thread.sleep(millis); } catch(Exception e) { }
+    }
 }

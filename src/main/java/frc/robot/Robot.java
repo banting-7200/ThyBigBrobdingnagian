@@ -17,16 +17,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 public class Robot extends TimedRobot {
   I2CCOM arduino;
 
-<<<<<<< Updated upstream
   public int m_rainbowFirstPixelHue = 0;
 
-  double motorSpeed = 0.6;//0.55 lowest speed 1 full speed
-  double leftArmMove = 0;
-  double rightArmMove = 0;
-
-=======
   /* Arm Switches */
->>>>>>> Stashed changes
   DigitalInput leftArmSwitch = new DigitalInput(0);
   DigitalInput rightArmSwitch = new DigitalInput(1);
 
@@ -88,24 +81,15 @@ public class Robot extends TimedRobot {
 
     head.set(kReverse);
     CameraServer.startAutomaticCapture();
-    
   }
 
   @Override
   public void robotPeriodic() {
-<<<<<<< Updated upstream
-    if(m_stick.getRawButtonPressed(rainbowLightToggle)){
-      if(rainbowSwitched){
-      rainbowSwitched = false;
-    }else {
-      rainbowSwitched = true;
-=======
     if(m_stick.getRawButtonPressed(rainbowLightToggle)) {
       rainbowSwitched = !rainbowSwitched;
       if(rainbowSwitched) LEDBufferCreator.rainbow();
       if(!rainbowSwitched) LEDBufferCreator.disableLights();
->>>>>>> Stashed changes
-    }
+   }
 
     m_led.setData(LEDBufferCreator.buffer);
   }
