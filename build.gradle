@@ -65,6 +65,7 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
+    implementation 'de.mobiuscode.nameof:nameof:1.0'
     testImplementation 'junit:junit:4.13.1'
 }
 
