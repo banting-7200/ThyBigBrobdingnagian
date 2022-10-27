@@ -55,7 +55,10 @@ public class Robot extends TimedRobot {
   double leftArmMove = 0;
   double rightArmMove = 0;
 
-  /* Button Mappings */
+  /* 
+   * Button Mappings 
+   * Integers assigned here are labelled on Logitech joystick.
+  */
   int headToggle = 1;
   int rainbowLightToggle = 2;
 
@@ -101,7 +104,7 @@ public class Robot extends TimedRobot {
     double armSpeedTemp = m_stick.getThrottle();
     double armSpeed = Utility.map(armSpeedTemp, -1, 1, 0.4, 1);
 
-    /* These threads are responsible for specific functionalities */
+    /* These threads are responsible for robot arm motors */
     Thread leftArm = new Thread() {
       public void run() {
         while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
@@ -232,6 +235,7 @@ public class Robot extends TimedRobot {
       }
     };
     //#endregion  
+
     //#region ButtonInputs
     /* Certain buttons are mapped to threads above */
     if(m_stick.getRawButtonPressed(leftArmToggleButton)) {
