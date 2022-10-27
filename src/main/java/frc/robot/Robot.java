@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
     m_right.setInverted(true);
 
     LEDBufferCreator = new LEDBuffers(56);
-    m_led.setLength(LEDBufferCreator.buffer.getLength());
+    m_led.setLength(LEDBufferCreator.getBufferLength());
     m_led.start();
 
     head.set(kReverse);
@@ -90,11 +90,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     if(m_stick.getRawButtonPressed(rainbowLightToggle)) {
       rainbowSwitched = !rainbowSwitched;
-      if(rainbowSwitched) LEDBufferCreator.rainbow();
-      if(!rainbowSwitched) LEDBufferCreator.disableLights();
    }
 
-    m_led.setData(LEDBufferCreator.buffer);
+    m_led.setData(rainbowSwitched ? LEDBufferCreator.rainbow() : LEDBufferCreator.disableLights());
   }
 
   @Override
