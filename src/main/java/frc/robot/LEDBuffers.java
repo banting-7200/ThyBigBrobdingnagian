@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.util.Color;
 
 /*
  * This class contains functions that change a private LEDBuffer
@@ -18,18 +19,52 @@ public class LEDBuffers {
     }
 
     private int rainbowFirstPixelHue = 0;
-    public AddressableLEDBuffer rainbow() {
-        for (var i = 0; i < buffer.getLength(); i++) {
-          final var hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
-          buffer.setHSV(i, hue, 255, 128);
-        }
+    public AddressableLEDBuffer rainbow(int start, int end) {
+      if(start < 0 && start >= buffer.getLength() && start > end) return buffer;
+      if(end < 0 && end >= buffer.getLength() && end < start) return buffer;
+
+      for (var i = start; i < end; i++) {
+        final var hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
+        buffer.setHSV(i, hue, 255, 128);
+      }
     
-        rainbowFirstPixelHue += 3;
-        rainbowFirstPixelHue %= 180;
-        return buffer;
+      rainbowFirstPixelHue += 3;
+      rainbowFirstPixelHue %= 180;
+      return buffer;
+    }
+
+    private int alternateDelay = 0;
+    private boolean alternateAltColors;
+    public AddressableLEDBuffer alternate(Color a, Color b, int pDelay, int start, int end) {
+      if((start < 0 || start >= buffer.getLength()) || start > end) return buffer;
+      if((end < 0 || end >= buffer.getLength()) || end < start) return buffer;
+
+      if(alternateDelay <= 0) {
+        alternateAltColors = !alternateAltColors;
+        alternateDelay = pDelay;
+      }
+
+      if(alternateDelay > 0) {
+        alternateDelay--;
+      }
+
+      for(int i = start; i < end; i++) {
+        if(i % 2 == 0) {
+          if(alternateAltColors) buffer.setLED(i, a);
+          else buffer.setLED(i, b);
+        } else {
+          if(alternateAltColors) buffer.setLED(i, b);
+          else buffer.setLED(i, a);
+        }
+      }
+
+      return buffer;
     }
     
-    public AddressableLEDBuffer disableLights() {
+    public AddressableLEDBuffer disableLights(int start, int end) {
+        if(start < 0 && start >= buffer.getLength() && start > end) return buffer;
+        if(end < 0 && end >= buffer.getLength() && end < start) return buffer;
+
         for (var i = 0; i < buffer.getLength(); i++) {
           buffer.setHSV(i, 0, 0, 0);
         }

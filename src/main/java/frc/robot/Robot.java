@@ -92,7 +92,10 @@ public class Robot extends TimedRobot {
       rainbowSwitched = !rainbowSwitched;
    }
 
-    m_led.setData(rainbowSwitched ? LEDBufferCreator.rainbow() : LEDBufferCreator.disableLights());
+    m_led.setData(
+      rainbowSwitched ? LEDBufferCreator.rainbow(0, LEDBufferCreator.getBufferLength()) : 
+      LEDBufferCreator.disableLights(0, LEDBufferCreator.getBufferLength())
+    );
   }
 
   @Override
