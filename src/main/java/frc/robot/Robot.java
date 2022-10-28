@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import frc.robot.utils.I2CCOM;
+import frc.robot.utils.Utility;
 import edu.wpi.first.wpilibj.*;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -45,8 +46,7 @@ public class Robot extends TimedRobot {
   public boolean leftArmToggleBool = false;
 
   AddressableLED m_led = new AddressableLED(9);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
-
+  LEDBuffers bufferCreator = new LEDBuffers(60);
 
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
 
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    m_led.setLength(m_ledBuffer.getLength());
+    m_led.setLength(bufferCreator.buffer.getLength());
     m_led.start();
 
     head.set(kReverse);
@@ -78,24 +78,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-
     if(m_stick.getRawButtonPressed(rainbowLightToggle)){
-      if(rainbowSwitched){
-      rainbowSwitched = false;
-    }else {
-      rainbowSwitched = true;
+      rainbowSwitched = !rainbowSwitched;
     }
-  }
 
-  if (rainbowSwitched == true) {
-    rainbow();
-  } else if(rainbowSwitched == false) {
-    rainbowOff();
-  }
+    if (rainbowSwitched == true) {
+      bufferCreator.rainbow();
+    } else if(rainbowSwitched == false) {
+      bufferCreator.disableLights();
+    }
 
-
-
-    m_led.setData(m_ledBuffer);
+    m_led.setData(bufferCreator.buffer);
   }
 
   @Override
@@ -141,7 +134,6 @@ public class Robot extends TimedRobot {
         leftArmToggleBool = false;
       }
     };
-
 
     Thread rightArm = new Thread() {
       public void run() {
@@ -302,26 +294,6 @@ public class Robot extends TimedRobot {
     try{
       Thread.sleep(millis);
     }catch(Exception E){
-    }
-  }
-
-  private void rainbow() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-    }
-    m_rainbowFirstPixelHue += 3; //shifting first pixel's color to create effect of moving color
-    m_rainbowFirstPixelHue %= 180; //set to translate into correct hsv value
-
-    //m_ledBuffer.setRGB(56, 255, 0, 0); //56 = first eye, labeled 56 because it is the 57th light on the string as they must all be attatched to one
-    //m_ledBuffer.setRGB(57, 0, 0, 255); //57 = second eye, 58th light (uncomment this once the burnt out light situation is figured out)
-  }
-
-//change values around so eyes light up red
-
-  private void rainbowOff() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setHSV(i, 0, 0, 0);
     }
   }
 }
