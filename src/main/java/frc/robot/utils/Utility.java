@@ -9,4 +9,8 @@ public class Utility {
     public static void delay(int millis){
         try{ Thread.sleep(millis); } catch(Exception e) { }
     }
+    
+    public static double lerp(double a, double b, double t) {
+        return a + (a - b) * t;
+    }
 }
