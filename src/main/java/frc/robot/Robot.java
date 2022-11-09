@@ -18,9 +18,9 @@ public class Robot extends TimedRobot {
 
   public int m_rainbowFirstPixelHue = 0;
 
-  int r = 1;
   int rshift = 0;
-  int rgradient = 0;
+  int rgradient = 0;//idk
+  int ledTreeCount = 50; //number of lights on the tree
 
   double motorSpeed = 0.6;// 0.55 lowest speed 1 full speed
   double leftArmMove = 0;
@@ -311,18 +311,20 @@ public class Robot extends TimedRobot {
 
      // lights code
 
-
+//lights from robot base
   private void rainbow() {
     for (var i = 0; i < 56; i++) {
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180; // setting base lights to
-                                                                                            // run rainbow cycle, base
-                                                                                            // lights are first 56
+      // setting base lights to
+      // run rainbow cycle, base
+      // lights are first 56
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
       m_ledBuffer.setHSV(i, hue, 255, 128);
     }
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
 
-    RedGradient();
+    //pattern of the tree
+    redBlueDown();
   }
 
   private void rainbowOff() {
@@ -331,24 +333,31 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private void RedGradient() {
-    for (int i = 57 + rgradient, treecount = 0; treecount < 50; treecount++) {
-
+  //The Pattern
+  //ledTreeCount is the number of lights on the tree
+  private void redBlueDown() {
+    for (int i = 56; i >= ledTreeCount; i++) { //for loop goes through led strip once then becomes infinte 
+// it resets the loop
       if (i > 106) {
-        i = 57;
-      }
-      m_ledBuffer.setRGB(i, 0, r, 0);
-      r = r + 1;
-      if (r > 255) {
-        r = 0;
-      }
+        //reseting the loop
+        i = 56;
     }
+//above is all apart of the for loop, it has nothing to do with the pattern
+//it just runs through all the lights infinitly, you can define the refresh rate with a delay
+       
+      for(int j = 56; j > 106; j++){
+        m_ledBuffer.setRGB(j, 0, 0, 255);
 
-    rgradient = rgradient + 1;
-    if (rgradient == 50) {
-      rgradient = 0;
+      }
+
+      
+
+            
+      //it sets the color of the light using rgb
+      //(number of lights, g, r, b)
+      
+     // m_ledBuffer.setRGB(i,0,0,0);
     }
-
   }
 
 
