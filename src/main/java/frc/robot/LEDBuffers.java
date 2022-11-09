@@ -20,9 +20,6 @@ public class LEDBuffers {
 
     private int rainbowFirstPixelHue = 0;
     public AddressableLEDBuffer rainbow(int start, int end) {
-      if(start < 0 && start >= buffer.getLength() && start > end) return buffer;
-      if(end < 0 && end >= buffer.getLength() && end < start) return buffer;
-
       for (var i = start; i < end; i++) {
         final var hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
         buffer.setHSV(i, hue, 255, 128);
@@ -36,9 +33,6 @@ public class LEDBuffers {
     private int alternateDelay = 0;
     private boolean alternateAltColors;
     public AddressableLEDBuffer alternate(Color a, Color b, int pDelay, int start, int end) {
-      if((start < 0 || start >= buffer.getLength()) || start > end) return buffer;
-      if((end < 0 || end >= buffer.getLength()) || end < start) return buffer;
-
       if(alternateDelay <= 0) {
         alternateAltColors = !alternateAltColors;
         alternateDelay = pDelay;
@@ -61,6 +55,38 @@ public class LEDBuffers {
       return buffer;
     }
     
+    private int knightRiderDelayBeforeTick;
+    private int knightRiderPosition = -1;
+    private int knightRiderDelta;
+    public AddressableLEDBuffer knightRiderLight(Color offColor, Color pointerColor, int pDelay, int start, int end) {
+
+      if(knightRiderPosition == -1) knightRiderPosition = (start + end) / 2;
+
+      if(knightRiderDelayBeforeTick > 0) {
+        knightRiderDelayBeforeTick--;
+        return buffer;
+      }
+
+      if(knightRiderPosition == end) {
+        knightRiderDelta = -1;
+      } else if(knightRiderPosition == start) {
+        knightRiderDelta = 1;
+      }
+
+      for(int i = start; i < end; i++) {
+        if(i == knightRiderPosition) {
+          buffer.setLED(i, pointerColor);
+          continue;
+        }
+
+        buffer.setLED(i, offColor);
+      }
+
+      knightRiderPosition += knightRiderDelta;
+      knightRiderDelayBeforeTick = pDelay;
+      return buffer;
+    }
+
     public AddressableLEDBuffer disableLights(int start, int end) {
         if(start < 0 && start >= buffer.getLength() && start > end) return buffer;
         if(end < 0 && end >= buffer.getLength() && end < start) return buffer;

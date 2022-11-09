@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.I2CCOM;
 import frc.robot.utils.Utility;
 import edu.wpi.first.wpilibj.*;
@@ -78,7 +79,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(56);
+    LEDBufferCreator = new LEDBuffers(106);
     m_led.setLength(LEDBufferCreator.getBufferLength());
     m_led.start();
 
@@ -92,9 +93,12 @@ public class Robot extends TimedRobot {
       rainbowSwitched = !rainbowSwitched;
    }
 
+    //m_led.setData(LEDBufferCreator.alternate(Color.kRed, Color.kBlue, 10, 56, LEDBufferCreator.getBufferLength()));
+    m_led.setData(LEDBufferCreator.knightRiderLight(Color.kAliceBlue, Color.kRed, 2, 56, LEDBufferCreator.getBufferLength()));
+    
     m_led.setData(
-      rainbowSwitched ? LEDBufferCreator.rainbow(0, LEDBufferCreator.getBufferLength()) : 
-      LEDBufferCreator.disableLights(0, LEDBufferCreator.getBufferLength())
+      rainbowSwitched ? LEDBufferCreator.rainbow(0, 56) : 
+      LEDBufferCreator.disableLights(0, 56)
     );
   }
 
