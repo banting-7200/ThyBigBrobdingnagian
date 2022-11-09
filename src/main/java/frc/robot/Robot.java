@@ -333,35 +333,23 @@ public class Robot extends TimedRobot {
     }
   }
 
+
   //The Pattern
   //ledTreeCount is the number of lights on the tree
   private void redBlueDown() {
-    for (int i = 56; i >= ledTreeCount; i++) { //for loop goes through led strip once then becomes infinte 
-// it resets the loop
-      if (i > 106) {
-        //reseting the loop
-        i = 56;
-    }
-//above is all apart of the for loop, it has nothing to do with the pattern
-//it just runs through all the lights infinitly, you can define the refresh rate with a delay
+    for (int i = 1; i >= 4; i++) { 
+
        
-      for(int j = 56; j > 106; j++){
+      for(int j = 56; j < 106; j++){
         m_ledBuffer.setRGB(j, 0, 0, 255);
 
       }
-
       
 
-            
-      //it sets the color of the light using rgb
-      //(number of lights, g, r, b)
-      
-     // m_ledBuffer.setRGB(i,0,0,0);
+
+    //m_ledBuffer.setRGB(j, 0, 0, 255);
     }
   }
 
-
- // private void RedGreenFlash(){
-//
-//  }
+  
 }
