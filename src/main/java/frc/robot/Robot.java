@@ -18,7 +18,11 @@ public class Robot extends TimedRobot {
 
   public int m_rainbowFirstPixelHue = 0;
 
-  double motorSpeed = 0.6;//0.55 lowest speed 1 full speed
+  int r = 1;
+  int rshift = 0;
+  int rgradient = 0;
+
+  double motorSpeed = 0.6;// 0.55 lowest speed 1 full speed
   double leftArmMove = 0;
   double rightArmMove = 0;
 
@@ -39,19 +43,19 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
 
-  //private boolean switched = false;
+  // private boolean switched = false;
   private boolean rainbowSwitched = false;
   public boolean rightArmToggleBool = false;
   public boolean leftArmToggleBool = false;
 
   AddressableLED m_led = new AddressableLED(9);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(56);
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(107);// 56 led on bottom, 3 LED = 1 instance
 
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
 
   // Button Map
   int headToggle = 1;
-  //int invertDrive = 2;
+  // int invertDrive = 2;
   int rainbowLightToggle = 2;
   int leftArmToggleButton = 5;
   int rightArmToggleButton = 6;
@@ -61,7 +65,7 @@ public class Robot extends TimedRobot {
   int rightArmHalfButton = 10;
   int leftForceLimitButton = 11;
   int rightForceLimitButton = 12;
-  
+
   @Override
   public void robotInit() {
     m_right.setInverted(true);
@@ -72,68 +76,69 @@ public class Robot extends TimedRobot {
     head.set(kReverse);
 
     CameraServer.startAutomaticCapture();
-    
+
   }
 
   @Override
   public void robotPeriodic() {
 
-    if(m_stick.getRawButtonPressed(rainbowLightToggle)){
-      if(rainbowSwitched){
-      rainbowSwitched = false;
-    }else {
-      rainbowSwitched = true;
+    if (m_stick.getRawButtonPressed(rainbowLightToggle)) {
+      if (rainbowSwitched) {
+        rainbowSwitched = false;
+      } else {
+        rainbowSwitched = true;
+      }
     }
-  }
 
-  if (rainbowSwitched == true) {
-    rainbow();
-  } else if(rainbowSwitched == false) {
-    rainbowOff();
-  }
-     
+    if (rainbowSwitched == true) {
+      rainbow();
+    } else if (rainbowSwitched == false) {
+      rainbowOff();
+    }
+
     m_led.setData(m_ledBuffer);
   }
 
   @Override
   public void teleopInit() {
-  //ran when teleop is enabled
+    // ran when teleop is enabled
   }
 
   @Override
   public void teleopPeriodic() {
-    //System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ". Left Switch Held: " + leftArmSwitch.get());
-    
+    // System.out.println("Right Limit Switch held: " + rightArmSwitch.get() + ".
+    // Left Switch Held: " + leftArmSwitch.get());
+
     double turn = m_stick.getX();
 
     /*
-    if (m_stick.getRawButtonPressed(2)) {
-      if(switched) {
-        switched = false;
-      } else {
-        switched = true;
-      }
-    }
-
-    if (switched == true) {
-      turn = m_stick.getZ();  
-    } else if(switched == false) {
-      turn = m_stick.getX();
-    }
-    */
+     * if (m_stick.getRawButtonPressed(2)) {
+     * if(switched) {
+     * switched = false;
+     * } else {
+     * switched = true;
+     * }
+     * }
+     * 
+     * if (switched == true) {
+     * turn = m_stick.getZ();
+     * } else if(switched == false) {
+     * turn = m_stick.getX();
+     * }
+     */
 
     double armSpeedTemp = m_stick.getThrottle();
     double armSpeed = map(armSpeedTemp, 1, -1, 0.4, 1);
 
     Thread leftArm = new Thread() {
       public void run() {
-        while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
-            m_leftArmMotor.set(armSpeed); //was 1
+        while (leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
+          m_leftArmMotor.set(armSpeed); // was 1
         }
         m_leftArmMotor.set(0);
         delay(200);
         m_leftArmMotor.set(-1);
-        delay(475); //550
+        delay(475); // 550
         m_leftArmMotor.set(0);
         leftArmToggleBool = false;
       }
@@ -141,7 +146,7 @@ public class Robot extends TimedRobot {
 
     Thread rightArm = new Thread() {
       public void run() {
-        while(rightArmSwitch.get() == false && m_stick.getRawButtonPressed(rightForceLimitButton) == false) {
+        while (rightArmSwitch.get() == false && m_stick.getRawButtonPressed(rightForceLimitButton) == false) {
           m_rightArmMotor.set(armSpeed);
         }
         m_rightArmMotor.set(0);
@@ -155,33 +160,33 @@ public class Robot extends TimedRobot {
 
     Thread leftHalf = new Thread() {
       public void run() {
-        if(leftArmSwitch.get() == false) {
+        if (leftArmSwitch.get() == false) {
           m_leftArmMotor.set(1);
-          delay(280); //350
+          delay(280); // 350
           // fail safe
-          if(leftArmSwitch.get() == true) {
+          if (leftArmSwitch.get() == true) {
             m_leftArmMotor.set(-1);
-            delay(475); //550
+            delay(475); // 550
             m_leftArmMotor.set(0);
           }
           m_leftArmMotor.set(0);
           delay(250);
           m_leftArmMotor.set(-1);
           delay(250);
-          m_leftArmMotor.set(0); 
+          m_leftArmMotor.set(0);
         }
       }
     };
 
     Thread rightHalf = new Thread() {
       public void run() {
-        if(rightArmSwitch.get() == false) {
+        if (rightArmSwitch.get() == false) {
           m_rightArmMotor.set(1);
-          delay(280); //350
+          delay(280); // 350
           // fail safe
-          if(rightArmSwitch.get() == true) {
+          if (rightArmSwitch.get() == true) {
             m_rightArmMotor.set(-1);
-            delay(475); //550
+            delay(475); // 550
             m_rightArmMotor.set(0);
           }
           m_rightArmMotor.set(0);
@@ -196,23 +201,24 @@ public class Robot extends TimedRobot {
 
     Thread leftHalfToggle = new Thread() {
       public void run() {
-        if(leftArmSwitch.get() == false) {
+        if (leftArmSwitch.get() == false) {
           leftArmToggleBool = true;
 
           m_leftArmMotor.set(0.7);
-          delay(350); //350
+          delay(350); // 350
 
           // fail safe
-          if(leftArmSwitch.get() == true) {
+          if (leftArmSwitch.get() == true) {
             m_leftArmMotor.set(-1);
-            delay(475); //550
+            delay(475); // 550
             m_leftArmMotor.set(0);
             leftArmToggleBool = false;
             return; // end thread
           }
           m_leftArmMotor.set(0);
 
-          while(!m_stick.getRawButtonPressed(leftArmToggleButton)) {}
+          while (!m_stick.getRawButtonPressed(leftArmToggleButton)) {
+          }
 
           delay(250);
           m_leftArmMotor.set(-0.7);
@@ -226,23 +232,24 @@ public class Robot extends TimedRobot {
 
     Thread rightHalfToggle = new Thread() {
       public void run() {
-        if(rightArmSwitch.get() == false) {
+        if (rightArmSwitch.get() == false) {
           rightArmToggleBool = true;
 
           m_rightArmMotor.set(0.7);
-          delay(350); //350
+          delay(350); // 350
 
           // fail safe
-          if(rightArmSwitch.get() == true) {
+          if (rightArmSwitch.get() == true) {
             m_rightArmMotor.set(-1);
-            delay(475); //550
+            delay(475); // 550
             m_rightArmMotor.set(0);
             rightArmToggleBool = false;
             return; // End Thread
           }
           m_rightArmMotor.set(0);
 
-          while(!m_stick.getRawButtonPressed(rightArmToggleButton)) {}
+          while (!m_stick.getRawButtonPressed(rightArmToggleButton)) {
+          }
 
           delay(250);
           m_rightArmMotor.set(-0.7);
@@ -254,36 +261,36 @@ public class Robot extends TimedRobot {
       }
     };
 
-    if(m_stick.getRawButtonPressed(leftArmToggleButton)) {
-      if(leftArmToggleBool == false){
+    if (m_stick.getRawButtonPressed(leftArmToggleButton)) {
+      if (leftArmToggleBool == false) {
         leftHalfToggle.start();
       }
     }
 
-    if(m_stick.getRawButtonPressed(rightArmToggleButton)) {
-      if(rightArmToggleBool == false) {
+    if (m_stick.getRawButtonPressed(rightArmToggleButton)) {
+      if (rightArmToggleBool == false) {
         rightHalfToggle.start();
       }
     }
 
-    if(m_stick.getRawButtonPressed(leftArmFullButton)) {
+    if (m_stick.getRawButtonPressed(leftArmFullButton)) {
       leftArm.start();
     }
 
-    if(m_stick.getRawButtonPressed(rightArmFullButton)){
+    if (m_stick.getRawButtonPressed(rightArmFullButton)) {
       System.out.println("Arm Button Pressed");
       rightArm.start();
     }
 
-    if(m_stick.getRawButtonPressed(leftArmHalfButton)) {
+    if (m_stick.getRawButtonPressed(leftArmHalfButton)) {
       leftHalf.start();
     }
 
-    if(m_stick.getRawButtonPressed(rightArmHalfButton)) {
+    if (m_stick.getRawButtonPressed(rightArmHalfButton)) {
       rightHalf.start();
     }
 
-    if(m_stick.getRawButtonPressed(headToggle)) {
+    if (m_stick.getRawButtonPressed(headToggle)) {
       head.toggle();
     }
 
@@ -294,20 +301,28 @@ public class Robot extends TimedRobot {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   }
 
-  public void delay(int millis){
-    try{
+  public void delay(int millis) {
+    try {
       Thread.sleep(millis);
-    }catch(Exception E){
+    } catch (Exception E) {
     }
   }
 
+
+     // lights code
+
+
   private void rainbow() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
+    for (var i = 0; i < 56; i++) {
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180; // setting base lights to
+                                                                                            // run rainbow cycle, base
+                                                                                            // lights are first 56
       m_ledBuffer.setHSV(i, hue, 255, 128);
     }
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
+
+    RedGradient();
   }
 
   private void rainbowOff() {
@@ -315,4 +330,29 @@ public class Robot extends TimedRobot {
       m_ledBuffer.setHSV(i, 0, 0, 0);
     }
   }
+
+  private void RedGradient() {
+    for (int i = 57 + rgradient, treecount = 0; treecount < 50; treecount++) {
+
+      if (i > 106) {
+        i = 57;
+      }
+      m_ledBuffer.setRGB(i, 0, r, 0);
+      r = r + 1;
+      if (r > 255) {
+        r = 0;
+      }
+    }
+
+    rgradient = rgradient + 1;
+    if (rgradient == 50) {
+      rgradient = 0;
+    }
+
+  }
+
+
+ // private void RedGreenFlash(){
+//
+//  }
 }
