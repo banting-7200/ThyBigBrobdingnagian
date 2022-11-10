@@ -60,18 +60,10 @@ public class LEDBuffers {
     private int knightRiderDelta;
     public AddressableLEDBuffer knightRiderLight(Color offColor, Color pointerColor, int pDelay, int start, int end) {
 
-      if(knightRiderPosition == -1) knightRiderPosition = (start + end) / 2;
-
-      if(knightRiderDelayBeforeTick > 0) {
-        knightRiderDelayBeforeTick--;
-        return buffer;
-      }
-
-      if(knightRiderPosition == end) {
-        knightRiderDelta = -1;
-      } else if(knightRiderPosition == start) {
+      if(knightRiderPosition == -1) {
+        knightRiderPosition = (start + end) / 2;
         knightRiderDelta = 1;
-      }
+      } 
 
       for(int i = start; i < end; i++) {
         if(i == knightRiderPosition) {
@@ -82,8 +74,19 @@ public class LEDBuffers {
         buffer.setLED(i, offColor);
       }
 
-      knightRiderPosition += knightRiderDelta;
-      knightRiderDelayBeforeTick = pDelay;
+      if(knightRiderDelayBeforeTick > 0) {
+        knightRiderDelayBeforeTick--;
+      } else {
+        if(knightRiderPosition == end) {
+          knightRiderDelta = -1;
+        } else if(knightRiderPosition == start) {
+          knightRiderDelta = 1;
+        }
+  
+        knightRiderPosition += knightRiderDelta;
+        knightRiderDelayBeforeTick = pDelay;
+      }
+
       return buffer;
     }
 

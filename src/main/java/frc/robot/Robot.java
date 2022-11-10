@@ -41,7 +41,6 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
 
-  //private boolean switched = false;
   private boolean rainbowSwitched = false;
   public boolean rightArmToggleBool = false;
   public boolean leftArmToggleBool = false;
@@ -79,7 +78,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(106);
+    LEDBufferCreator = new LEDBuffers(306);
     m_led.setLength(LEDBufferCreator.getBufferLength());
     m_led.start();
 
@@ -94,11 +93,11 @@ public class Robot extends TimedRobot {
    }
 
     //m_led.setData(LEDBufferCreator.alternate(Color.kRed, Color.kBlue, 10, 56, LEDBufferCreator.getBufferLength()));
-    m_led.setData(LEDBufferCreator.knightRiderLight(Color.kAliceBlue, Color.kRed, 2, 56, LEDBufferCreator.getBufferLength()));
+    //m_led.setData(LEDBufferCreator.knightRiderLight(Color.kBlue, Color.kRed, 2, 56, LEDBufferCreator.getBufferLength()));
     
     m_led.setData(
-      rainbowSwitched ? LEDBufferCreator.rainbow(0, 56) : 
-      LEDBufferCreator.disableLights(0, 56)
+      rainbowSwitched ? LEDBufferCreator.rainbow(56, 306) : 
+      LEDBufferCreator.disableLights(56, 306)
     );
   }
 
@@ -276,7 +275,7 @@ public class Robot extends TimedRobot {
       head.toggle();
     }
     //#endregion
-    
+
     /* Driving code */
     double turn = m_stick.getX();
     m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
