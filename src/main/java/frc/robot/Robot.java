@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(306);
+    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT);
     m_led.setLength(LEDBufferCreator.getBufferLength());
     m_led.start();
 
@@ -96,14 +96,13 @@ public class Robot extends TimedRobot {
     //m_led.setData(LEDBufferCreator.knightRiderLight(Color.kBlue, Color.kRed, 2, 56, LEDBufferCreator.getBufferLength()));
     
     m_led.setData(
-      rainbowSwitched ? LEDBufferCreator.rainbow(56, 306) : 
-      LEDBufferCreator.disableLights(56, 306)
+      rainbowSwitched ? LEDBufferCreator.rainbow(56, Utility.LED_COUNT) : 
+      LEDBufferCreator.disableLights(56, Utility.LED_COUNT)
     );
   }
 
   @Override
   public void teleopPeriodic() {
-
     //#region Threads
     double armSpeedTemp = m_stick.getThrottle();
     double armSpeed = Utility.map(armSpeedTemp, -1, 1, 0.4, 1);
