@@ -50,7 +50,6 @@ public class Robot extends TimedRobot {
   LEDBuffers LEDBufferCreator;
   AddressableLED m_led = new AddressableLED(9);
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
-  LEDEffect currentEffect;
 
   /* Motor speeds */
   double motorSpeed = 0.75; //0.55 lowest speed 1 full speed
@@ -80,7 +79,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT);
+    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT, Utility.BASE_LED_COUNT);
     m_led.setLength(Utility.LED_COUNT);
     m_led.start();
 
@@ -88,27 +87,52 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
   }
 
+  LEDEffect currentTreeEffect;
+  LEDEffect currentEffect;
+
   @Override
   public void robotPeriodic() {
 
-    // I am aware that this is a mess.
+    // I am aware that this is a mess. Kept everything like this for time sake. Refactoring will be done later
     // Only 6 effects can be mapped after 7 as 12 is the last button on the LED buttons region.
-    if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_RAINBOW];
-    } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_GRADIENT];
-    } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_DISABLED];
-    } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_ALTERNATE];
-    } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_TRIPLEALTERNATE];
-    } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
-      currentEffect = LEDBufferCreator.effects[Utility.FX_UKRAINEGRADIENT];
+    // TO change FX of tree, hold down button 2 and press an effect button
+
+    if(!m_stick.getRawButton(2)) {
+      if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_RAINBOW];
+      } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_GRADIENT];
+      } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_DISABLED];
+      } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_ALTERNATE];
+      } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_TRIPLEALTERNATE];
+      } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
+        currentEffect = LEDBufferCreator.effects[Utility.FX_UKRAINEGRADIENT];
+      }
+    }
+
+    if(m_stick.getRawButton(2)) {
+      if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_RAINBOW];
+      } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_GRADIENT];
+      } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_DISABLED];
+      } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_ALTERNATE];
+      } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_TRIPLEALTERNATE];
+      } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
+        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_UKRAINEGRADIENT];
+      }
     }
 
     if(currentEffect != null) {
-      m_led.setData(currentEffect.tick());
+      currentEffect.tick();
+      currentTreeEffect.tick();
+      m_led.setData(LEDBufferCreator.buffer);
     }
   }
 
