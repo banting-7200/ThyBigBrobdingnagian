@@ -12,6 +12,8 @@ public class Utility {
     public static final int FX_DISABLED = 2;
     public static final int FX_ALTERNATE = 3;
     public static final int FX_TRIPLEALTERNATE = 4;
+    public static final int FX_UKRAINEGRADIENT = 5;
+    
     public static final int BASE_LED_COUNT = 56;
     public static final int LED_COUNT = 356;
 

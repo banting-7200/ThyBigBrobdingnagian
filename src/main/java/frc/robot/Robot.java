@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   LEDEffect currentEffect;
 
   /* Motor speeds */
-  double motorSpeed = 0.8; //0.55 lowest speed 1 full speed
+  double motorSpeed = 0.75; //0.55 lowest speed 1 full speed
   double leftArmMove = 0;
   double rightArmMove = 0;
 
@@ -80,8 +80,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(Utility.BASE_LED_COUNT);
-    m_led.setLength(Utility.BASE_LED_COUNT);
+    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT);
+    m_led.setLength(Utility.LED_COUNT);
     m_led.start();
 
     head.set(kReverse);
@@ -103,6 +103,8 @@ public class Robot extends TimedRobot {
       currentEffect = LEDBufferCreator.effects[Utility.FX_ALTERNATE];
     } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
       currentEffect = LEDBufferCreator.effects[Utility.FX_TRIPLEALTERNATE];
+    } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_UKRAINEGRADIENT];
     }
 
     if(currentEffect != null) {

@@ -23,7 +23,7 @@ public class AlternateTriple implements LEDEffect{
 
         this.start = start;
         this.end = end;
-    }//hi ava was here
+    } //hi ava was here
 
     @Override
     public AddressableLEDBuffer tick() {
