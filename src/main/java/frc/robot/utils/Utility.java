@@ -3,17 +3,24 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.util.Color;
 
 /*
- * This class contains some commonly used functions across the project
+ * This class contains some commonly used functions/constants across the project
  */
 public class Utility {
-    public static final int LED_COUNT = 306;
+
+    public static final int FX_RAINBOW = 0;
+    public static final int FX_GRADIENT = 1;
+    public static final int FX_DISABLED = 2;
+    public static final int FX_ALTERNATE = 3;
+    public static final int FX_TRIPLEALTERNATE = 4;
+    public static final int BASE_LED_COUNT = 56;
+    public static final int LED_COUNT = 356;
 
     public static double map(double x, double in_min, double in_max, double out_min, double out_max) {
         double ratio = (out_max - out_min) / (in_max - in_min);
         return (x - in_min) * ratio + out_min;
     }
 
-    public static void delay(int millis){
+    public static void delay(int millis) {
         try{ Thread.sleep(millis); } catch(Exception e) { }
     }
 

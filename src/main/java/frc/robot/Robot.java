@@ -7,10 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.util.Color;
+
 import frc.robot.utils.I2CCOM;
+import frc.robot.utils.LEDEffect;
 import frc.robot.utils.Utility;
 import edu.wpi.first.wpilibj.*;
+
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -41,7 +43,6 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_left, m_right);
   private final Joystick m_stick = new Joystick(0);
 
-  private boolean rainbowSwitched = false;
   public boolean rightArmToggleBool = false;
   public boolean leftArmToggleBool = false;
 
@@ -49,9 +50,10 @@ public class Robot extends TimedRobot {
   LEDBuffers LEDBufferCreator;
   AddressableLED m_led = new AddressableLED(9);
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
+  LEDEffect currentEffect;
 
   /* Motor speeds */
-  double motorSpeed = .6;//0.55 lowest speed 1 full speed
+  double motorSpeed = 0.8; //0.55 lowest speed 1 full speed
   double leftArmMove = 0;
   double rightArmMove = 0;
 
@@ -78,8 +80,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT);
-    m_led.setLength(LEDBufferCreator.getBufferLength());
+    LEDBufferCreator = new LEDBuffers(Utility.BASE_LED_COUNT);
+    m_led.setLength(Utility.BASE_LED_COUNT);
     m_led.start();
 
     head.set(kReverse);
@@ -88,26 +90,33 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(m_stick.getRawButtonPressed(rainbowLightToggle)) {
-      rainbowSwitched = !rainbowSwitched;
-   }
 
-    //m_led.setData(LEDBufferCreator.alternate(Color.kRed, Color.kBlue, 10, 56, LEDBufferCreator.getBufferLength()));
-    //m_led.setData(LEDBufferCreator.knightRiderLight(Color.kBlue, Color.kRed, 2, 56, LEDBufferCreator.getBufferLength()));
-    
-    m_led.setData(
-      rainbowSwitched ? LEDBufferCreator.rainbow(56, Utility.LED_COUNT) : 
-      LEDBufferCreator.disableLights(56, Utility.LED_COUNT)
-    );
+    // I am aware that this is a mess.
+    // Only 6 effects can be mapped after 7 as 12 is the last button on the LED buttons region.
+    if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_RAINBOW];
+    } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_GRADIENT];
+    } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_DISABLED];
+    } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_ALTERNATE];
+    } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
+      currentEffect = LEDBufferCreator.effects[Utility.FX_TRIPLEALTERNATE];
+    }
+
+    if(currentEffect != null) {
+      m_led.setData(currentEffect.tick());
+    }
   }
 
   @Override
   public void teleopPeriodic() {
     //#region Threads
-    double armSpeedTemp = m_stick.getThrottle();
-    double armSpeed = Utility.map(armSpeedTemp, -1, 1, 0.4, 1);
+    //double armSpeedTemp = m_stick.getThrottle();
+    //double armSpeed = Utility.map(armSpeedTemp, -1, 1, 0.4, 1);
 
-    /* These threads are responsible for robot arm motors */
+    /*
     Thread leftArm = new Thread() {
       public void run() {
         while(leftArmSwitch.get() == false && m_stick.getRawButtonPressed(leftForceLimitButton) == false) {
@@ -238,9 +247,10 @@ public class Robot extends TimedRobot {
       }
     };
     //#endregion  
+    */
 
     //#region ButtonInputs
-    /* Certain buttons are mapped to threads above */
+    /* Certain buttons are mapped to threads above
     if(m_stick.getRawButtonPressed(leftArmToggleButton)) {
       if(leftArmToggleBool == false){
         leftHalfToggle.start();
@@ -274,6 +284,7 @@ public class Robot extends TimedRobot {
       head.toggle();
     }
     //#endregion
+    */
 
     /* Driving code */
     double turn = m_stick.getX();

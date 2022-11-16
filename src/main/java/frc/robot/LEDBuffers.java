@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.LEDBuffers.*;
+import frc.robot.utils.LEDEffect;
 
 /*
  * This class contains functions that change a private LEDBuffer
@@ -9,25 +11,26 @@ import edu.wpi.first.wpilibj.util.Color;
  */
 public class LEDBuffers {
     private AddressableLEDBuffer buffer;
+    public LEDEffect[] effects;
 
     public LEDBuffers(int bufferLength) {
       buffer = new AddressableLEDBuffer(bufferLength);
+
+      effects = new LEDEffect[] {
+        new Rainbow(buffer, 0, bufferLength),
+        new Gradient(buffer, Color.kGreen, Color.kRed, 10.0, 0, bufferLength),
+        new Disabled(buffer, 0, bufferLength),
+        new Alternate(buffer, Color.kRed, Color.kGreen, 0, bufferLength, 10),
+        new AlternateTriple(buffer, new Color[] {
+          Color.kRed,
+          Color.kGreen,
+          Color.kWhite
+        }, 10, 0, bufferLength)
+      };
     }
 
     public int getBufferLength() {
       return buffer.getLength();
-    }
-
-    private int rainbowFirstPixelHue = 0;
-    public AddressableLEDBuffer rainbow(int start, int end) {
-      for (var i = start; i < end; i++) {
-        final var hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
-        buffer.setHSV(i, hue, 255, 128);
-      }
-    
-      rainbowFirstPixelHue += 3;
-      rainbowFirstPixelHue %= 180;
-      return buffer;
     }
 
     private int alternateDelay = 0;
@@ -58,8 +61,7 @@ public class LEDBuffers {
     private int knightRiderDelayBeforeTick;
     private int knightRiderPosition = -1;
     private int knightRiderDelta;
-    public AddressableLEDBuffer knightRiderLight(Color offColor, Color pointerColor, int pDelay, int start, int end) {
-
+    public AddressableLEDBuffer knightRiderLight(Color offColor, Color pointerColor, int pDelay, int start, int end, int barWidth) {
       if(knightRiderPosition == -1) {
         knightRiderPosition = (start + end) / 2;
         knightRiderDelta = 1;
@@ -67,11 +69,16 @@ public class LEDBuffers {
 
       for(int i = start; i < end; i++) {
         if(i == knightRiderPosition) {
-          buffer.setLED(i, pointerColor);
-          continue;
-        }
+          for(int j = i - barWidth; j < i + barWidth; j++) {
+            if(j >= 0 && j < end) {
+              buffer.setLED(j, pointerColor);
+            }
+          }
 
-        buffer.setLED(i, offColor);
+          i += barWidth;
+        } else {
+          buffer.setLED(i, offColor);
+        }
       }
 
       if(knightRiderDelayBeforeTick > 0) {
@@ -90,14 +97,27 @@ public class LEDBuffers {
       return buffer;
     }
 
-    public AddressableLEDBuffer disableLights(int start, int end) {
-        if(start < 0 && start >= buffer.getLength() && start > end) return buffer;
-        if(end < 0 && end >= buffer.getLength() && end < start) return buffer;
+    private int travelBarDelay = 0;
+    private int worldBarPosition = 0;
+    public AddressableLEDBuffer travelBar(Color offColor, Color pointerColor, int pDelay, int start, int end, int barWidth) {
+      if(travelBarDelay <= 0) {
+        travelBarDelay = pDelay;
+        worldBarPosition++;
+      }
+      
+      for(int i = 0; i < buffer.getLength(); i++) {
+        buffer.setLED(i, offColor);
+      }
 
-        for (var i = 0; i < buffer.getLength(); i++) {
-          buffer.setHSV(i, 0, 0, 0);
+      for(int i = worldBarPosition - barWidth; i <= worldBarPosition + barWidth; i++) {
+        int localPosition = (start + i) % (end - start);
+
+        if(localPosition >= start && localPosition < end) {
+          buffer.setLED(i, pointerColor);
         }
+      }
 
-        return buffer;
+      travelBarDelay--;
+      return buffer;
     }
 }
