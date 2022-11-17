@@ -18,10 +18,16 @@ public class Gradient implements LEDEffect{
     private int prevIndex;
     private int currIndex;
 
+    private int start;
+    private int end;
+
     public Gradient(AddressableLEDBuffer target, Color[] colors, double fadeSpeed, int start, int end) {
         this.target = target;
         this.colors = colors;
+        this.start = start;
+        this.end = end;
         multiplier = 1;
+
         this.fadeSpeed = fadeSpeed;
         prevIndex = 0;
         currIndex = 1;
@@ -32,7 +38,7 @@ public class Gradient implements LEDEffect{
         x += 0.02 * fadeSpeed * multiplier;
 
         Color result = Utility.lerpColors(colors[prevIndex], colors[currIndex], x);
-        for(int i = 0; i < target.getLength(); i++) {
+        for(int i = start; i < end; i++) {
             target.setLED(i, result);
         }
 

@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.I2CCOM;
 import frc.robot.utils.LEDEffect;
 import frc.robot.utils.Utility;
@@ -47,7 +47,9 @@ public class Robot extends TimedRobot {
   public boolean leftArmToggleBool = false;
 
   /* LED Variables */
-  LEDBuffers LEDBufferCreator;
+  AddressableLEDBuffer buffer;
+  LEDBuffers BaseLEDBuffer;
+  LEDBuffers TreeLEDBuffer;
   AddressableLED m_led = new AddressableLED(9);
   DoubleSolenoid head = new DoubleSolenoid(9, PneumaticsModuleType.CTREPCM, 1, 0);
 
@@ -79,7 +81,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_right.setInverted(true);
 
-    LEDBufferCreator = new LEDBuffers(Utility.LED_COUNT, Utility.BASE_LED_COUNT);
+    buffer = new AddressableLEDBuffer(Utility.LED_COUNT);
+    BaseLEDBuffer = new LEDBuffers(buffer, 0, Utility.BASE_LED_COUNT);
+    TreeLEDBuffer = new LEDBuffers(buffer, 0, Utility.LED_COUNT);
+
     m_led.setLength(Utility.LED_COUNT);
     m_led.start();
 
@@ -96,43 +101,23 @@ public class Robot extends TimedRobot {
     // I am aware that this is a mess. Kept everything like this for time sake. Refactoring will be done later
     // Only 6 effects can be mapped after 7 as 12 is the last button on the LED buttons region.
     // TO change FX of tree, hold down button 2 and press an effect button
-
-    if(!m_stick.getRawButton(2)) {
-      if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_RAINBOW];
-      } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_GRADIENT];
-      } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_DISABLED];
-      } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_ALTERNATE];
-      } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_TRIPLEALTERNATE];
-      } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
-        currentEffect = LEDBufferCreator.effects[Utility.FX_UKRAINEGRADIENT];
-      }
-    }
-
-    if(m_stick.getRawButton(2)) {
-      if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_RAINBOW];
-      } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_GRADIENT];
-      } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_DISABLED];
-      } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_ALTERNATE];
-      } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_TRIPLEALTERNATE];
-      } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
-        currentTreeEffect = LEDBufferCreator.treeEffects[Utility.FX_UKRAINEGRADIENT];
-      }
+    if(m_stick.getRawButton(7 + Utility.FX_RAINBOW)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_RAINBOW];
+    } else if(m_stick.getRawButton(7 + Utility.FX_GRADIENT)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_GRADIENT];
+    } else if(m_stick.getRawButton(7 + Utility.FX_DISABLED)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_DISABLED];
+    } else if(m_stick.getRawButton(7 + Utility.FX_ALTERNATE)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_ALTERNATE];
+    } else if(m_stick.getRawButton(7 + Utility.FX_TRIPLEALTERNATE)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_TRIPLEALTERNATE];
+    } else if(m_stick.getRawButton(7 + Utility.FX_UKRAINEGRADIENT)) {
+      currentEffect = TreeLEDBuffer.effects[Utility.FX_UKRAINEGRADIENT];
     }
 
     if(currentEffect != null) {
       currentEffect.tick();
-      currentTreeEffect.tick();
-      m_led.setData(LEDBufferCreator.buffer);
+      m_led.setData(buffer);
     }
   }
 
