@@ -6,8 +6,8 @@ import frc.robot.utils.LEDEffect;
 public class Rainbow implements LEDEffect{
 
     private AddressableLEDBuffer buffer;
-
     private int rainbowFirstPixelHue;
+
     private final int start;
     private final int end;
 
@@ -22,9 +22,9 @@ public class Rainbow implements LEDEffect{
     @Override
     public AddressableLEDBuffer tick() {
         for (var i = start; i < end; i++) {
-            final var hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
+            int hue = (rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
             buffer.setHSV(i, hue, 255, 128);
-          }
+        }
         
         rainbowFirstPixelHue += 3;
         rainbowFirstPixelHue %= 180;

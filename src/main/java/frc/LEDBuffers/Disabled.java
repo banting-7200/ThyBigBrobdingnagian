@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.LEDEffect;
 
+/*
+ * This class disables lights given a start and end index for a buffer.
+ */
 public class Disabled implements LEDEffect {
 
     private AddressableLEDBuffer target;

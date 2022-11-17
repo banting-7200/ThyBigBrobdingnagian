@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.LEDBuffers.*;
 import frc.robot.utils.LEDEffect;
-import frc.robot.utils.Utility;
 
 /*
  * This class contains different classes that contain different effects.

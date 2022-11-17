@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.LEDEffect;
 
+/*
+ * This class creates an alternating light effect amongst 2 colours
+ */
 public class Alternate implements LEDEffect{
     private AddressableLEDBuffer target;
     private boolean alternateAltColors;
@@ -37,6 +40,10 @@ public class Alternate implements LEDEffect{
             alternateDelay--;
         }
     
+        /*
+         * For every 2nd light (i % 2), set LED to a, if alternateAltColors = true, set LED to b
+         * For every odd light(i % 2 != 0) set LED to b, if alternateAltColors = true, set LED to a
+         */
         for(int i = start; i < end; i++) {
             if(i % 2 == 0) {
               if(alternateAltColors) target.setLED(i, a);

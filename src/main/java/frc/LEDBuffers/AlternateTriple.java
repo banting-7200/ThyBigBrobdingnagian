@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.LEDEffect;
 
+/*
+ * This class alternates amongst 3 colors only.
+ * TODO: have effect be expandable
+ */
 public class AlternateTriple implements LEDEffect{
 
     private AddressableLEDBuffer target;
