@@ -3,6 +3,9 @@ package frc.LEDBuffers;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.utils.LEDEffect;
 
+/*
+ * Creates a rainbow effect on LEDs
+ */
 public class Rainbow implements LEDEffect{
 
     private AddressableLEDBuffer buffer;

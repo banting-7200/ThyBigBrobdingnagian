@@ -31,7 +31,7 @@ public class LEDBuffers {
           Color.kGreen,
           Color.kWhite
         }, 10, start, end),
-        new UkraineLights(buffer, start, end, 1.0)
+        new UkraineLights(buffer, start, end, 5.0)
       };
     }
 

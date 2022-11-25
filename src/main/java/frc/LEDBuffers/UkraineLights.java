@@ -7,14 +7,14 @@ import frc.robot.utils.Utility;
 
 /*
  * This class makes lights make a gradient for ukraine
+ * f(x, d) = round(0.5 * Math.cos(x + d) + 0.5)
  */
 public class UkraineLights implements LEDEffect{
-
-    private final Color yellow = new Color(.8, 1.0, 0.0);
+    private final Color yellow = new Color(.8, 0.9, 0.0);
     private final Color blue = Color.kBlue;
 
-    private AddressableLEDBuffer target;
-    private double changeRate;
+    private AddressableLEDBuffer target; //target LEDBuffer to change
+    private double changeRate; // this is the 'd' value in f(x, d)
 
     private double lerpOffset;
     private int start;
@@ -23,7 +23,7 @@ public class UkraineLights implements LEDEffect{
     public UkraineLights(AddressableLEDBuffer target, int start, int end, Double changeRate) {
         this.target = target;
         this.changeRate = changeRate;
-        
+
         this.start = start;
         this.end = end;
     }
@@ -41,12 +41,13 @@ public class UkraineLights implements LEDEffect{
             target.setLED(i, Utility.lerpColors(yellow, blue, x));
         }
 
+        //Increase by changeRate/periodicCycleTime(ms)
         lerpOffset += changeRate;
         return target;
     }
 
-    //f(x) = (1/2)cos(x)+(1/2)
+    // f(x, d) = round(0.5 * Math.cos(x + d) + 0.5)
     private double getEvaluationPercentage(double x, double offset) {
-        return (0.5 * Math.cos(x + offset)) + 0.5;
+        return Math.round((0.5 * Math.cos(x + offset)) + 0.5);
     }
 }

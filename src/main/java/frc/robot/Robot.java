@@ -296,6 +296,6 @@ public class Robot extends TimedRobot {
 
     /* Driving code */
     double turn = m_stick.getX();
-    m_robotDrive.arcadeDrive(m_stick.getY() * motorSpeed, turn * motorSpeed);
+    m_robotDrive.arcadeDrive(-m_stick.getY() * motorSpeed, turn * motorSpeed);
   }
 }

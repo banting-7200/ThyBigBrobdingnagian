@@ -45,7 +45,7 @@ public class Gradient implements LEDEffect{
         /*
          * If the colour time has reached the b colour value,
          *  - reset time and increase previous colour index and current colour index
-         *  - reset prev/curr colour indices if they go out of colour array bounds.
+         *  - reset prev/curr colour pointers if they go out of colour array bounds.
          */
         if(x >= 1) {
             x = 0.0;
